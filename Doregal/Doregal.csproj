@@ -8,10 +8,32 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Ultraviolet.FreeType2" Version="2019.9.0.4045" />
     <PackageReference Include="Ultraviolet.Game.NETCore" Version="2019.9.0.4045" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Content\Fonts\FiraSans-Bold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Fonts\FiraSans-BoldItalic.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Fonts\FiraSans-Italic.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Fonts\FiraSans-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Fonts\FiraSans.uvmeta">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Fonts\SegoeUI.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\Fonts\SegoeUITexture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Content\Manifests\Global.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

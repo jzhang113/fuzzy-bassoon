@@ -1,13 +1,16 @@
 ﻿using Doregal.Assets;
 using Doregal.Input;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Ultraviolet;
 using Ultraviolet.Content;
 using Ultraviolet.Core;
 using Ultraviolet.Core.Text;
+using Ultraviolet.FreeType2;
 using Ultraviolet.Graphics;
 using Ultraviolet.Graphics.Graphics2D;
+using Ultraviolet.Graphics.Graphics2D.Text;
 using Ultraviolet.OpenGL;
 using Ultraviolet.Platform;
 
@@ -23,13 +26,14 @@ namespace Doregal
     public partial class Game : UltravioletApplication
 #endif
     {
-        private ContentManager content;
-        private Sprite sprite;
-        private SpriteAnimationController controller1;
-        private SpriteAnimationController controller2;
-        private SpriteAnimationController controller3;
-        private SpriteAnimationController controller4;
-        private SpriteBatch spriteBatch;
+        private ContentManager _content;
+        private TextRenderer _textRenderer;
+        private TextLayoutCommandStream _textLayoutCommands;
+        private FreeTypeFont _firaFont;
+        private Sprite _asciiSprite;
+        private SpriteBatch _spriteBatch;
+        private int _x;
+        private int _y;
 
         public Game()
             : base("Ultraviolet", "Sample 2 - Handling Input")
@@ -47,24 +51,36 @@ namespace Doregal
             }
         }
 
-        protected override UltravioletContext OnCreatingUltravioletContext() => new OpenGLUltravioletContext(this);
+        protected override UltravioletContext OnCreatingUltravioletContext()
+        {
+            var config = new OpenGLUltravioletConfiguration();
+            config.Plugins.Add(new FreeTypeFontPlugin());
+
+            return new OpenGLUltravioletContext(this, config);
+        }
 
         protected override void OnLoadingContent()
         {
             LoadInputBindings();
 
-            this.content = ContentManager.Create("Content");
-            LoadContentManifests(this.content);
+            _content = ContentManager.Create("Content");
+            LoadContentManifests();
             LoadLocalizationDatabases();
 
-            this.sprite = this.content.Load<Sprite>(GlobalSpriteID.Explosion);
-            this.spriteBatch = SpriteBatch.Create();
+            _textRenderer = new TextRenderer();
+            _textLayoutCommands = new TextLayoutCommandStream();
+            _firaFont = _content.Load<FreeTypeFont>(GlobalFontID.FiraSans);
 
-            this.controller1 = new SpriteAnimationController();
-            this.controller2 = new SpriteAnimationController();
-            this.controller3 = new SpriteAnimationController();
-            this.controller4 = new SpriteAnimationController();
+            _textRenderer.RegisterFont("fira", _firaFont);
+            _textRenderer.RegisterStyle("preset1", new TextStyle(_firaFont, true, null, Color.Lime));
+            _textRenderer.RegisterStyle("preset2", new TextStyle(_firaFont, null, true, Color.Red));
 
+            _spriteBatch = SpriteBatch.Create();
+            _asciiSprite = _content.Load<Sprite>(GlobalSpriteID.Ascii);
+
+            _x = 0;
+            _y = 0;
+            
             base.OnLoadingContent();
         }
 
@@ -77,29 +93,12 @@ namespace Doregal
 
         protected override void OnUpdating(UltravioletTime time)
         {
-            this.sprite.Update(time);
+            // _asciiSprite.Update(time);
 
-            if (time.TotalTime.TotalMilliseconds > 250 && !controller1.IsPlaying)
-            {
-                controller1.PlayAnimation(sprite["Explosion"]);
-            }
-            if (time.TotalTime.TotalMilliseconds > 500 && !controller2.IsPlaying)
-            {
-                controller2.PlayAnimation(sprite["Explosion"]);
-            }
-            if (time.TotalTime.TotalMilliseconds > 750 && !controller3.IsPlaying)
-            {
-                controller3.PlayAnimation(sprite["Explosion"]);
-            }
-            if (time.TotalTime.TotalMilliseconds > 1000 && !controller4.IsPlaying)
-            {
-                controller4.PlayAnimation(sprite["Explosion"]);
-            }
+            SampleInput.Actions actions = Ultraviolet.GetInput().GetActions();
 
-            controller1.Update(time);
-            controller2.Update(time);
-            controller3.Update(time);
-            controller4.Update(time);
+            if (actions.MoveLeft.IsDown()) _x -= 10;
+            else if (actions.MoveRight.IsDown()) _x += 10;
 
             if (Ultraviolet.GetInput().GetActions().ExitApplication.IsPressed())
             {
@@ -110,26 +109,51 @@ namespace Doregal
 
         protected override void OnDrawing(UltravioletTime time)
         {
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
+            var window = Ultraviolet.GetPlatform().Windows.GetPrimary();
+            var width = window.DrawableSize.Width;
+            var height = window.DrawableSize.Height;
 
-            //spriteBatch.DrawSprite(this.sprite["Explosion"].Controller, new Vector2(32, 32));
-            //spriteBatch.DrawSprite(controller1, new Vector2(132, 32));
-            //spriteBatch.DrawSprite(controller2, new Vector2(232, 32));
-            //spriteBatch.DrawSprite(controller3, new Vector2(332, 32));
-            //spriteBatch.DrawSprite(controller4, new Vector2(432, 32));
-            spriteBatch.DrawSprite((this.content.Load<Sprite>(GlobalSpriteID.Ascii))["Player"].Controller, new Vector2(64, 64), null, null, Color.Red, 0);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
 
-            spriteBatch.End();
+            _spriteBatch.DrawSprite(_asciiSprite["Player"].Controller, new Vector2(_x, _y), null, null, Color.Red, 0);
+
+
+            var settingsTopLeft = new TextLayoutSettings(_firaFont, width, height, TextFlags.AlignTop | TextFlags.AlignLeft);
+            _textRenderer.Draw(_spriteBatch, "Aligned top left", Vector2.Zero, Color.White, settingsTopLeft);
+
+            const string text =
+    "Ultraviolet Formatting Commands\n" +
+    "\n" +
+    "||c:AARRGGBB| - Changes the color of text.\n" +
+    "|c:FFFF0000|red|c| |c:FFFF8000|orange|c| |c:FFFFFF00|yellow|c| |c:FF00FF00|green|c| |c:FF0000FF|blue|c| |c:FF6F00FF|indigo|c| |c:FFFF00FF|magenta|c|\n" +
+    "\n" +
+    "||font:name| - Changes the current font.\n" +
+    "We can |font:fira|transition to a completely different font|font| within a single line\n" +
+    "\n" +
+    "||b| and ||i| - Changes the current font style.\n" +
+    "|b|bold|b| |i|italic|i| |b||i|bold italic|i||b|\n" +
+    "\n" +
+    "||style:name| - Changes to a preset style.\n" +
+    "|style:preset1|this is preset1|style| |style:preset2|this is preset2|style|\n" +
+    "\n" +
+    "||icon:name| - Draws an icon in the text.\n" +
+    "[|icon:ok| OK] [|icon:cancel| Cancel]";
+
+            var settings = new TextLayoutSettings(_firaFont, width, height, TextFlags.AlignMiddle | TextFlags.AlignCenter);
+            _textRenderer.CalculateLayout(text, _textLayoutCommands, settings);
+            _textRenderer.Draw(_spriteBatch, _textLayoutCommands, Vector2.Zero, Color.White);
+
+            _spriteBatch.End();
 
             base.OnDrawing(time);
         }
 
-        protected override void Dispose(Boolean disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                SafeDispose.Dispose(spriteBatch);
-                SafeDispose.Dispose(content);
+                SafeDispose.Dispose(_spriteBatch);
+                SafeDispose.Dispose(_content);
             }
             base.Dispose(disposing);
         }
@@ -137,24 +161,24 @@ namespace Doregal
         protected void LoadLocalizationDatabases()
         {
             var fss = FileSystemService.Create();
-            var databases = content.GetAssetFilePathsInDirectory("Localization", "*.xml");
-            foreach (var database in databases)
+            IEnumerable<string> databases = _content.GetAssetFilePathsInDirectory("Localization", "*.xml");
+            foreach (string database in databases)
             {
-                using (var stream = fss.OpenRead(database))
+                using (Stream stream = fss.OpenRead(database))
                 {
                     Localization.Strings.LoadFromStream(stream);
                 }
             }
         }
 
-        protected void LoadContentManifests(ContentManager content)
+        protected void LoadContentManifests()
         {
-            var uvContent = Ultraviolet.GetContent();
+            IUltravioletContent uvContent = Ultraviolet.GetContent();
 
-            var contentManifestFiles = this.content.GetAssetFilePathsInDirectory("Manifests");
+            IEnumerable<string> contentManifestFiles = _content.GetAssetFilePathsInDirectory("Manifests");
             uvContent.Manifests.Load(contentManifestFiles);
 
-            // uvContent.Manifests["Global"]["Fonts"].PopulateAssetLibrary(typeof(GlobalFontID));
+            uvContent.Manifests["Global"]["FreeTypeFonts"].PopulateAssetLibrary(typeof(GlobalFontID));
             uvContent.Manifests["Global"]["Sprites"].PopulateAssetLibrary(typeof(GlobalSpriteID));
         }
 

@@ -18,12 +18,18 @@ namespace Doregal.Input
             public static Actions Instance { get; } = CreateSingleton<Actions>();
 
             public InputAction ExitApplication { get; private set; }
+            public InputAction MoveLeft { get; private set; }
+            public InputAction MoveRight { get; private set; }
 
             /// <inheritdoc/>
             protected override void OnCreatingActions()
             {
-                this.ExitApplication =
+                ExitApplication =
                     CreateAction("EXIT_APPLICATION");
+                MoveLeft =
+                    CreateAction("MOVE_LEFT");
+                MoveRight =
+                    CreateAction("MOVE_RIGHT");
 
                 base.OnCreatingActions();
             }
@@ -46,8 +52,12 @@ namespace Doregal.Input
 
             private void Reset_Desktop()
             {
-                this.ExitApplication
+                ExitApplication
                     .Primary = CreateKeyboardBinding(Key.Escape);
+                MoveLeft
+                    .Primary = CreateKeyboardBinding(Key.A);
+                MoveRight
+                    .Primary = CreateKeyboardBinding(Key.D);
             }
 
             private void Reset_Android()
