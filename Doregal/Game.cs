@@ -1,5 +1,7 @@
 ﻿using Doregal.Assets;
 using Doregal.Input;
+using Doregal.UI;
+using Doregal.UI.Screens;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -77,6 +79,11 @@ namespace Doregal
 
             _spriteBatch = SpriteBatch.Create();
             _asciiSprite = _content.Load<Sprite>(GlobalSpriteID.Ascii);
+
+
+            var screenService = new UIScreenService(_content);
+            var screen = screenService.Get<SampleScreen1>();
+            Ultraviolet.GetUI().GetScreens().Open(screen, TimeSpan.Zero);
 
             _x = 0;
             _y = 0;

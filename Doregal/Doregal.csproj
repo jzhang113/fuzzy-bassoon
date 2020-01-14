@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Ultraviolet.FreeType2" Version="2019.9.0.4045" />
     <PackageReference Include="Ultraviolet.Game.NETCore" Version="2019.9.0.4045" />
+    <PackageReference Include="Ultraviolet.ImGuiViewProvider" Version="2019.9.0.4045" />
   </ItemGroup>
 
   <ItemGroup>
@@ -134,6 +135,24 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Content\Sprites\Textures\Explosion_29.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\UI\Screens\SampleScreen1\SampleScreen1.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\UI\Screens\SampleScreen1\SegoeUI.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\UI\Screens\SampleScreen1\SegoeUITexture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\UI\Screens\SampleScreen2\Garamond.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\UI\Screens\SampleScreen2\GaramondTexture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\UI\Screens\SampleScreen2\SampleScreen2.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
