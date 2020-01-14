@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Sprite>
+  <Animations Texture="Fnord_16x16" Width="16" Height="16">
+    <Animation Name="Player">
+      <Frames>
+        <Frame X="16" Y="0" />
+      </Frames>
+    </Animation>
+  </Animations>
+</Sprite>

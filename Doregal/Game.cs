@@ -110,13 +110,14 @@ namespace Doregal
 
         protected override void OnDrawing(UltravioletTime time)
         {
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
 
-            spriteBatch.DrawSprite(this.sprite["Explosion"].Controller, new Vector2(32, 32));
-            spriteBatch.DrawSprite(controller1, new Vector2(132, 32));
-            spriteBatch.DrawSprite(controller2, new Vector2(232, 32));
-            spriteBatch.DrawSprite(controller3, new Vector2(332, 32));
-            spriteBatch.DrawSprite(controller4, new Vector2(432, 32));
+            //spriteBatch.DrawSprite(this.sprite["Explosion"].Controller, new Vector2(32, 32));
+            //spriteBatch.DrawSprite(controller1, new Vector2(132, 32));
+            //spriteBatch.DrawSprite(controller2, new Vector2(232, 32));
+            //spriteBatch.DrawSprite(controller3, new Vector2(332, 32));
+            //spriteBatch.DrawSprite(controller4, new Vector2(432, 32));
+            spriteBatch.DrawSprite((this.content.Load<Sprite>(GlobalSpriteID.Ascii))["Player"].Controller, new Vector2(64, 64), null, null, Color.Red, 0);
 
             spriteBatch.End();
 

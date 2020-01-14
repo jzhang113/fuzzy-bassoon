@@ -2,5 +2,6 @@
 <ContentManifest Name="Global">
   <ContentGroup Name="Sprites" Directory="Sprites" Type="Ultraviolet.Graphics.Graphics2D.Sprite">
     <Asset Name="Explosion">Explosion</Asset>
+    <Asset Name="Ascii">Ascii</Asset>
   </ContentGroup>
 </ContentManifest>
