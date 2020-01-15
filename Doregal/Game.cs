@@ -70,22 +70,6 @@ namespace Doregal
             base.OnShutdown();
         }
 
-        protected override void OnUpdating(UltravioletTime time)
-        {
-            if (Ultraviolet.GetInput().GetActions().ExitApplication.IsPressed())
-            {
-                Exit();
-            }
-            base.OnUpdating(time);
-        }
-
-        protected override void OnDrawing(UltravioletTime time)
-        {
-            // Ultraviolet.GetGraphics().Clear(Color.Black);
-
-            base.OnDrawing(time);
-        }
-
         protected void LoadLocalizationDatabases(ContentManager content)
         {
             Contract.Require(content, nameof(content));
