@@ -4,7 +4,7 @@ using Ultraviolet.Input;
 
 namespace Doregal.Input
 {
-    public static class SampleInput
+    public static class MainInput
     {
         public static Actions GetActions(this IUltravioletInput input) =>
             Actions.Instance;
@@ -20,21 +20,20 @@ namespace Doregal.Input
             public InputAction ExitApplication { get; private set; }
             public InputAction MoveLeft { get; private set; }
             public InputAction MoveRight { get; private set; }
+            public InputAction MoveUp { get; private set; }
+            public InputAction MoveDown { get; private set; }
 
-            /// <inheritdoc/>
             protected override void OnCreatingActions()
             {
-                ExitApplication =
-                    CreateAction("EXIT_APPLICATION");
-                MoveLeft =
-                    CreateAction("MOVE_LEFT");
-                MoveRight =
-                    CreateAction("MOVE_RIGHT");
+                ExitApplication = CreateAction("EXIT_APPLICATION");
+                MoveLeft = CreateAction("MOVE_LEFT");
+                MoveRight = CreateAction("MOVE_RIGHT");
+                MoveUp = CreateAction("MOVE_UP");
+                MoveDown = CreateAction("MOVE_DOWN");
 
                 base.OnCreatingActions();
             }
 
-            /// <inheritdoc/>
             protected override void OnResetting()
             {
                 switch (Ultraviolet.Platform)
@@ -52,12 +51,11 @@ namespace Doregal.Input
 
             private void Reset_Desktop()
             {
-                ExitApplication
-                    .Primary = CreateKeyboardBinding(Key.Escape);
-                MoveLeft
-                    .Primary = CreateKeyboardBinding(Key.A);
-                MoveRight
-                    .Primary = CreateKeyboardBinding(Key.D);
+                ExitApplication.Primary = CreateKeyboardBinding(Key.Escape);
+                MoveLeft.Primary = CreateKeyboardBinding(Key.A);
+                MoveRight.Primary = CreateKeyboardBinding(Key.D);
+                MoveUp.Primary = CreateKeyboardBinding(Key.W);
+                MoveDown.Primary = CreateKeyboardBinding(Key.S);
             }
 
             private void Reset_Android()

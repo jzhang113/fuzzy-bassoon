@@ -13,8 +13,8 @@ namespace Doregal.UI
     {
         public UIScreenService(ContentManager globalContent)
         {
-            Register(new SampleScreen1(globalContent, this));
-            Register(new SampleScreen2(globalContent, this));
+            Register(new TitleScreen(globalContent, this));
+            Register(new MainScreen(globalContent, this));
         }
 
         public T Get<T>() where T : UIScreen
