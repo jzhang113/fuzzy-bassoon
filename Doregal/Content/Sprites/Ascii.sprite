@@ -3,7 +3,17 @@
   <Animations Texture="Fnord_16x16" Width="16" Height="16">
     <Animation Name="Player">
       <Frames>
-        <Frame X="16" Y="0" />
+        <Frame X="0" Y="64" />
+      </Frames>
+    </Animation>
+    <Animation Name="Wall">
+      <Frames>
+        <Frame X="48" Y="32" />
+      </Frames>
+    </Animation>
+    <Animation Name="Floor">
+      <Frames>
+        <Frame X="224" Y="32" />
       </Frames>
     </Animation>
   </Animations>

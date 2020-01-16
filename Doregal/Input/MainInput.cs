@@ -6,14 +6,11 @@ namespace Doregal.Input
 {
     public static class MainInput
     {
-        public static Actions GetActions(this IUltravioletInput input) =>
-            Actions.Instance;
+        public static Actions GetActions(this IUltravioletInput input) => Actions.Instance;
 
         public class Actions : InputActionCollection
         {
-            public Actions(UltravioletContext uv)
-                : base(uv)
-            { }
+            public Actions(UltravioletContext uv) : base(uv) { }
 
             public static Actions Instance { get; } = CreateSingleton<Actions>();
 
@@ -60,8 +57,7 @@ namespace Doregal.Input
 
             private void Reset_Android()
             {
-                this.ExitApplication
-                    .Primary = CreateKeyboardBinding(Key.AppControlBack);
+                ExitApplication.Primary = CreateKeyboardBinding(Key.AppControlBack);
             }
         }
     }

@@ -57,7 +57,7 @@ namespace Doregal.UI.Screens
                     var screen = _uiScreenService.Get<MainScreen>();
                     Screens.Open(screen);
                 }
-                else if (keyboard.IsKeyPressed(Key.Q))
+                else if (keyboard.IsKeyPressed(Key.Q) || keyboard.IsKeyPressed(Key.Escape))
                 {
                     Ultraviolet.Host.Exit();
                 }
