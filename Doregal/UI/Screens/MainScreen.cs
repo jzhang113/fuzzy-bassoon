@@ -93,21 +93,15 @@ namespace Doregal.UI.Screens
             spriteBatch.Draw(_blankTexture, new RectangleF(0, 0, Width, Height), Color.Black);
 
             // walls
-            for (int xtos = 0; xtos <= Width / _map.Camera.Zoom;  xtos++)
+            for (int x = 0; x <= _map.Camera.MapWidthTiles;  x++)
             {
-                for (int ytos = 0; ytos <= Height / _map.Camera.Zoom; ytos++)
+                for (int y = 0; y <= _map.Camera.MapHeightTiles; y++)
                 {
-                    var cameraTileX = (int)(_map.Camera.X / _map.Camera.Zoom);
-                    var cameraTileY = (int)(_map.Camera.Y / _map.Camera.Zoom);
+                    int tileX = _map.Camera.TileX + x;
+                    int tileY = _map.Camera.TileY + y;
 
-                    int tileX = cameraTileX + xtos;
-                    int tileY = cameraTileY + ytos;
-
-                    float fudgeX = _map.Camera.X - cameraTileX * _map.Camera.Zoom;
-                    float fudgeY = _map.Camera.Y - cameraTileY * _map.Camera.Zoom;
-
-                    float newX = _map.Camera.Zoom * xtos - fudgeX;
-                    float newY = _map.Camera.Zoom * ytos - fudgeY;
+                    float pixelX = _map.Camera.Zoom * x - _map.Camera.OffsetX;
+                    float pixelY = _map.Camera.Zoom * y - _map.Camera.OffsetY;
 
                     if (tileX < 0 || tileY < 0 || tileX >= BASE_MAP_WIDTH || tileY >= BASE_MAP_HEIGHT)
                         continue;
@@ -115,7 +109,7 @@ namespace Doregal.UI.Screens
                     bool walk = _map.Field[tileX, tileY];
                     string tile = walk ? "Floor" : "Wall";
 
-                    spriteBatch.DrawSprite(_asciiSprite[tile].Controller, new Vector2(newX, newY));
+                    spriteBatch.DrawSprite(_asciiSprite[tile].Controller, new Vector2(pixelX, pixelY));
                 }
             }
 

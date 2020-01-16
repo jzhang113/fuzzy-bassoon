@@ -7,18 +7,29 @@ namespace Doregal.World
     // current position of the camera, in pixels
     public class Camera
     {
-        public float MapWidth { get; }
-        public float MapHeight { get; }
+        // positions in pixels
+        public float MapWidth => MapWidthTiles * Zoom;
+        public float MapHeight => MapHeightTiles * Zoom;
         public float ScreenWidth { get; }
         public float ScreenHeight { get; }
         public float X { get; private set; }
         public float Y { get; private set; }
         public int Zoom { get; set; }
 
-        public Camera(float mapWidth, float mapHeight, float screenWidth, float screenHeight, int zoom)
+        // positions in tiles
+        public int MapWidthTiles { get; }
+        public int MapHeightTiles { get; }
+        public int TileX => (int)(X / Zoom);
+        public int TileY => (int)(Y / Zoom);
+
+        // partial camera position
+        public float OffsetX => X - TileX * Zoom;
+        public float OffsetY => Y - TileY * Zoom;
+
+        public Camera(int mapWidth, int mapHeight, float screenWidth, float screenHeight, int zoom)
         {
-            MapWidth = mapWidth * zoom;
-            MapHeight = mapHeight * zoom;
+            MapWidthTiles = mapWidth;
+            MapHeightTiles = mapHeight;
             ScreenWidth = screenWidth;
             ScreenHeight = screenHeight;
             Zoom = zoom;
