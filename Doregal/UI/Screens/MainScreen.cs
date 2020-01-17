@@ -1,4 +1,5 @@
 ﻿using Doregal.Assets;
+using Doregal.Entities;
 using Doregal.Input;
 using Doregal.World;
 using System;
@@ -21,6 +22,7 @@ namespace Doregal.UI.Screens
         private readonly TextRenderer _textRenderer;
         private Map _map;
         private bool _firstLoad = true;
+        private Entity _player;
 
         private const int BASE_MAP_WIDTH = 80;
         private const int BASE_MAP_HEIGHT = 60;
@@ -41,6 +43,8 @@ namespace Doregal.UI.Screens
 
             _asciiSprite = GlobalContent.Load<Sprite>(GlobalSpriteID.Ascii);
 
+            _player = new Entity(_asciiSprite["Player"]);
+
             Opening += (_) =>
             {
                 if (_firstLoad)
@@ -57,11 +61,10 @@ namespace Doregal.UI.Screens
             {
                 MainInput.Actions actions = Ultraviolet.GetInput().GetActions();
 
-                if (actions.MoveLeft.IsDown()) _map.playerX = _map.playerX <= 0 ? 0 : _map.playerX - 1;
-                else if (actions.MoveRight.IsDown()) _map.playerX = _map.playerX >= _map.Camera.MapWidthTiles - 1 ? _map.Camera.MapWidthTiles - 1 : _map.playerX + 1;
-
-                if (actions.MoveUp.IsDown()) _map.playerY = _map.playerY <= 0 ? 0 : _map.playerY - 1;
-                else if (actions.MoveDown.IsDown()) _map.playerY = _map.playerY >= _map.Camera.MapHeightTiles - 1 ? _map.Camera.MapHeightTiles - 1 : _map.playerY + 1;
+                if (actions.MoveLeft.IsDown()) _player.Move(Vector2.UnitX);
+                else if (actions.MoveRight.IsDown()) _player.Move(-Vector2.UnitX);
+                if (actions.MoveUp.IsDown()) _player.Move(Vector2.UnitY);
+                else if (actions.MoveDown.IsDown()) _player.Move(-Vector2.UnitY);
 
                 _map.Camera.Update(new Vector2(_map.playerX, _map.playerY));
 
