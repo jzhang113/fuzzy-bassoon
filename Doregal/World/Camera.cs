@@ -14,11 +14,13 @@ namespace Doregal.World
         public float ScreenHeight { get; }
         public float X { get; private set; }
         public float Y { get; private set; }
-        public int Zoom { get; set; }
+        public float Zoom { get; set; }
 
         // positions in tiles
         public int MapWidthTiles { get; }
         public int MapHeightTiles { get; }
+        public int ScreenWidthTiles => (int)(ScreenWidth / Zoom);
+        public int ScreenHeightTiles => (int)(ScreenHeight / Zoom);
         public int TileX => (int)(X / Zoom);
         public int TileY => (int)(Y / Zoom);
 
@@ -26,7 +28,7 @@ namespace Doregal.World
         public float OffsetX => X - TileX * Zoom;
         public float OffsetY => Y - TileY * Zoom;
 
-        public Camera(int mapWidth, int mapHeight, float screenWidth, float screenHeight, int zoom)
+        public Camera(int mapWidth, int mapHeight, float screenWidth, float screenHeight, float zoom)
         {
             MapWidthTiles = mapWidth;
             MapHeightTiles = mapHeight;
@@ -38,22 +40,24 @@ namespace Doregal.World
         internal void Update(in Vector2 center)
         {
             // set left and top limits for the camera
-            float startX = Math.Max(center.X - ScreenWidth / 2, 0);
-            float startY = Math.Max(center.Y - ScreenHeight / 2, 0);
+            float startX = Math.Max(center.X * Zoom - ScreenWidth / 2, 0);
+            float startY = Math.Max(center.Y * Zoom - ScreenHeight / 2, 0);
 
             // set right and bottom limits for the camera
             float xDiff = MapWidth - ScreenWidth;
             float yDiff = MapHeight - ScreenHeight;
+
             X = xDiff < 0 ? 0 : Math.Min(xDiff, startX);
             Y = yDiff < 0 ? 0 : Math.Min(yDiff, startY);
         }
 
-        internal bool OnScreen(in Vector2 pos)
+        internal bool OnMap(in Vector2 mapPos)
         {
-            float x = pos.X;
-            float y = pos.Y;
-
-            return x >= X && x < X + ScreenWidth && y >= Y && y < Y + ScreenHeight;
+            bool xOnMap = mapPos.X >= TileX && mapPos.X < X + ScreenWidthTiles;
+            bool yOnMap = mapPos.Y >= TileY && mapPos.Y < Y + ScreenHeightTiles;
+            return xOnMap && yOnMap;
         }
+
+        internal Vector2 ToScreenPos(in Vector2 mapPos) => (mapPos - new Vector2(TileX, TileY)) * Zoom;
     }
 }

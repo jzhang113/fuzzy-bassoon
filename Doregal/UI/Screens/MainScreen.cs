@@ -19,8 +19,6 @@ namespace Doregal.UI.Screens
         private readonly Sprite _asciiSprite;
         private readonly Texture2D _blankTexture;
         private readonly TextRenderer _textRenderer;
-        private readonly int _tileWidth;
-        private readonly int _tileHeight;
         private Map _map;
         private bool _firstLoad = true;
 
@@ -42,8 +40,6 @@ namespace Doregal.UI.Screens
             _textRenderer = new TextRenderer();
 
             _asciiSprite = GlobalContent.Load<Sprite>(GlobalSpriteID.Ascii);
-            _tileWidth = _asciiSprite["Player"].Controller.Width;
-            _tileHeight = _asciiSprite["Player"].Controller.Height;
 
             Opening += (_) =>
             {
@@ -61,11 +57,11 @@ namespace Doregal.UI.Screens
             {
                 MainInput.Actions actions = Ultraviolet.GetInput().GetActions();
 
-                if (actions.MoveLeft.IsDown()) _map.playerX = _map.playerX <= 0 ? 0 : _map.playerX - 5;
-                else if (actions.MoveRight.IsDown()) _map.playerX = _map.playerX >= Width - _map.Camera.Zoom ? Width - 16 : _map.playerX + 5;
+                if (actions.MoveLeft.IsDown()) _map.playerX = _map.playerX <= 0 ? 0 : _map.playerX - 1;
+                else if (actions.MoveRight.IsDown()) _map.playerX = _map.playerX >= _map.Camera.MapWidthTiles - 1 ? _map.Camera.MapWidthTiles - 1 : _map.playerX + 1;
 
-                if (actions.MoveUp.IsDown()) _map.playerY = _map.playerY <= 0 ? 0 : _map.playerY - 5;
-                else if (actions.MoveDown.IsDown()) _map.playerY = _map.playerY >= Height - _map.Camera.Zoom ? Height - 16 : _map.playerY + 5;
+                if (actions.MoveUp.IsDown()) _map.playerY = _map.playerY <= 0 ? 0 : _map.playerY - 1;
+                else if (actions.MoveDown.IsDown()) _map.playerY = _map.playerY >= _map.Camera.MapHeightTiles - 1 ? _map.Camera.MapHeightTiles - 1 : _map.playerY + 1;
 
                 _map.Camera.Update(new Vector2(_map.playerX, _map.playerY));
 
@@ -93,27 +89,30 @@ namespace Doregal.UI.Screens
             spriteBatch.Draw(_blankTexture, new RectangleF(0, 0, Width, Height), Color.Black);
 
             // walls
-            for (int x = 0; x <= _map.Camera.MapWidthTiles;  x++)
+            for (int y = 0; y <= _map.Camera.ScreenHeightTiles; y++)
             {
-                for (int y = 0; y <= _map.Camera.MapHeightTiles; y++)
+                for (int x = 0; x <= _map.Camera.ScreenWidthTiles; x++)
                 {
                     int tileX = _map.Camera.TileX + x;
                     int tileY = _map.Camera.TileY + y;
 
-                    float pixelX = _map.Camera.Zoom * x - _map.Camera.OffsetX;
-                    float pixelY = _map.Camera.Zoom * y - _map.Camera.OffsetY;
-
-                    if (tileX < 0 || tileY < 0 || tileX >= BASE_MAP_WIDTH || tileY >= BASE_MAP_HEIGHT)
-                        continue;
+                    // sanity check
+                    if (tileX < 0 || tileY < 0 || tileX >= BASE_MAP_WIDTH || tileY >= BASE_MAP_HEIGHT) continue;
 
                     bool walk = _map.Field[tileX, tileY];
                     string tile = walk ? "Floor" : "Wall";
 
-                    spriteBatch.DrawSprite(_asciiSprite[tile].Controller, new Vector2(pixelX, pixelY));
+                    float pixelX = _map.Camera.Zoom * x - _map.Camera.OffsetX;
+                    float pixelY = _map.Camera.Zoom * y - _map.Camera.OffsetY;
+
+                    spriteBatch.DrawSprite(_asciiSprite[tile].Controller, new Vector2(pixelX, pixelY), _map.Camera.Zoom, _map.Camera.Zoom);
                 }
             }
 
-            spriteBatch.DrawSprite(_asciiSprite["Player"].Controller, new Vector2(_map.playerX, _map.playerY), null, null, Color.Red, 0);
+            spriteBatch.DrawSprite(
+                _asciiSprite["Player"].Controller, 
+                _map.Camera.ToScreenPos(new Vector2(_map.playerX, _map.playerY)), 
+                _map.Camera.Zoom, _map.Camera.Zoom, Color.Red, 0);
 
             base.OnDrawingForeground(time, spriteBatch);
         }

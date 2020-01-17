@@ -11,8 +11,8 @@ namespace Doregal.World
         public bool[,] Field { get; }
         public Camera Camera { get; }
 
-        public int playerX = 0;
-        public int playerY = 0;
+        public float playerX = 0;
+        public float playerY = 0;
 
         private NoiseMap _noise;
 
