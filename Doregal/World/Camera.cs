@@ -58,6 +58,6 @@ namespace Doregal.World
             return xOnMap && yOnMap;
         }
 
-        internal Vector2 ToScreenPos(in Vector2 mapPos) => (mapPos - new Vector2(TileX, TileY)) * Zoom;
+        internal Vector2 ToScreenPos(in Vector2 mapPos) => (mapPos - new Vector2(TileX, TileY)) * Zoom - new Vector2(OffsetX, OffsetY);
     }
 }

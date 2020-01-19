@@ -61,12 +61,12 @@ namespace Doregal.UI.Screens
             {
                 MainInput.Actions actions = Ultraviolet.GetInput().GetActions();
 
-                if (actions.MoveLeft.IsDown()) _player.Move(Vector2.UnitX);
-                else if (actions.MoveRight.IsDown()) _player.Move(-Vector2.UnitX);
-                if (actions.MoveUp.IsDown()) _player.Move(Vector2.UnitY);
-                else if (actions.MoveDown.IsDown()) _player.Move(-Vector2.UnitY);
+                if (actions.MoveLeft.IsDown()) _player.Move(-Vector2.UnitX);
+                else if (actions.MoveRight.IsDown()) _player.Move(Vector2.UnitX);
+                if (actions.MoveUp.IsDown()) _player.Move(-Vector2.UnitY);
+                else if (actions.MoveDown.IsDown()) _player.Move(Vector2.UnitY);
 
-                _map.Camera.Update(new Vector2(_map.playerX, _map.playerY));
+                _map.Camera.Update(_player.Position);
 
                 if (actions.ExitApplication.IsDown())
                 {
@@ -78,8 +78,12 @@ namespace Doregal.UI.Screens
                 {
                     _map.Generate();
                 }
-                if (keyboard.IsKeyPressed(Key.Z)) _map.Camera.Zoom++;
-                else if (keyboard.IsKeyPressed(Key.X)) _map.Camera.Zoom--;
+
+                var mouse = Ultraviolet.GetInput().GetMouse();
+                mouse.WheelScrolled += (window, m, x, y) =>
+                {
+                    _map.Camera.Zoom += (float)y / 100;
+                };
             }
             base.OnUpdating(time);
         }
@@ -114,7 +118,7 @@ namespace Doregal.UI.Screens
 
             spriteBatch.DrawSprite(
                 _asciiSprite["Player"].Controller, 
-                _map.Camera.ToScreenPos(new Vector2(_map.playerX, _map.playerY)), 
+                _map.Camera.ToScreenPos(_player.Position), 
                 _map.Camera.Zoom, _map.Camera.Zoom, Color.Red, 0);
 
             base.OnDrawingForeground(time, spriteBatch);
