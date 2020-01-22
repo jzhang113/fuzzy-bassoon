@@ -10,6 +10,7 @@ using Ultraviolet.Content;
 using Ultraviolet.Core;
 using Ultraviolet.Core.Text;
 using Ultraviolet.FreeType2;
+using Ultraviolet.ImGuiViewProvider;
 using Ultraviolet.OpenGL;
 using Ultraviolet.Platform;
 
@@ -44,6 +45,7 @@ namespace Doregal
         {
             var config = new OpenGLUltravioletConfiguration();
             config.Plugins.Add(new FreeTypeFontPlugin());
+            config.Plugins.Add(new ImGuiPlugin());
 
             return new OpenGLUltravioletContext(this, config);
         }

@@ -9,12 +9,14 @@ using Ultraviolet.Core;
 using Ultraviolet.Graphics;
 using Ultraviolet.Graphics.Graphics2D;
 using Ultraviolet.Graphics.Graphics2D.Text;
+using Ultraviolet.ImGuiViewProvider;
+using Ultraviolet.ImGuiViewProvider.Bindings;
 using Ultraviolet.Input;
 using Ultraviolet.UI;
 
 namespace Doregal.UI.Screens
 {
-    public class MainScreen : UIScreen
+    public class MainScreen : UIScreen, IImGuiPanel
     {
         private readonly SpriteFont _font;
         private readonly Sprite _asciiSprite;
@@ -57,16 +59,16 @@ namespace Doregal.UI.Screens
 
         protected override void OnUpdating(UltravioletTime time)
         {
+            _player.ResetAccel();
+
             if (IsReadyForInput)
             {
                 MainInput.Actions actions = Ultraviolet.GetInput().GetActions();
 
-                if (actions.MoveLeft.IsDown()) _player.Move(-Vector2.UnitX);
-                else if (actions.MoveRight.IsDown()) _player.Move(Vector2.UnitX);
-                if (actions.MoveUp.IsDown()) _player.Move(-Vector2.UnitY);
-                else if (actions.MoveDown.IsDown()) _player.Move(Vector2.UnitY);
-
-                _map.Camera.Update(_player.Position);
+                if (actions.MoveLeft.IsDown()) _player.Move(-Vector2.UnitX, time.ElapsedTime);
+                else if (actions.MoveRight.IsDown()) _player.Move(Vector2.UnitX, time.ElapsedTime);
+                if (actions.MoveUp.IsDown()) _player.Move(-Vector2.UnitY, time.ElapsedTime);
+                else if (actions.MoveDown.IsDown()) _player.Move(Vector2.UnitY, time.ElapsedTime);
 
                 if (actions.ExitApplication.IsDown())
                 {
@@ -85,10 +87,13 @@ namespace Doregal.UI.Screens
                     _map.Camera.Zoom += (float)y / 100;
                 };
             }
+
+            _player.RealMove(time.ElapsedTime);
+            _map.Camera.Update(_player.Position);
             base.OnUpdating(time);
         }
 
-        protected override void OnDrawingForeground(UltravioletTime time, SpriteBatch spriteBatch)
+        protected override void OnDrawingBackground(UltravioletTime time, SpriteBatch spriteBatch)
         {
             //Ultraviolet.GetGraphics().Clear(Color.Black);
 
@@ -117,11 +122,29 @@ namespace Doregal.UI.Screens
             }
 
             spriteBatch.DrawSprite(
-                _asciiSprite["Player"].Controller, 
-                _map.Camera.ToScreenPos(_player.Position), 
+                _asciiSprite["Player"].Controller,
+                _map.Camera.ToScreenPos(_player.Position),
                 _map.Camera.Zoom, _map.Camera.Zoom, Color.Red, 0);
 
             base.OnDrawingForeground(time, spriteBatch);
+        }
+
+        public void ImGuiRegisterResources(ImGuiView view)
+        {
+        }
+
+        public void ImGuiUpdate(UltravioletTime time)
+        {
+            if (ImGui.Begin("Player movement", ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                ImGui.SliderFloat("Friction", ref _player.Friction, 0, 1);
+                ImGui.SliderFloat2("Max Velocity", ref _player.MaxVelocity, 0, 1);
+            }
+            ImGui.End();
+        }
+
+        public void ImGuiDraw(UltravioletTime time)
+        {
         }
     }
 }

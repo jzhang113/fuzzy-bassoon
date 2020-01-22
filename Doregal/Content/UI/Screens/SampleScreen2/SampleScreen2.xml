@@ -3,4 +3,5 @@
   DefaultOpenTransitionDuration="1000.0"
   DefaultCloseTransitionDuration="1000.0">
   <Layout />
+  <View />
 </UIPanelDefinition>
