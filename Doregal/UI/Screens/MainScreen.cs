@@ -45,13 +45,13 @@ namespace Doregal.UI.Screens
 
             _asciiSprite = GlobalContent.Load<Sprite>(GlobalSpriteID.Ascii);
 
-            _player = new Entity(_asciiSprite["Player"]);
+            _player = new Entity(_asciiSprite["Player"], 0.5f, Color.Red);
 
             Opening += (_) =>
             {
                 if (_firstLoad)
                 {
-                    _map = new Map(BASE_MAP_WIDTH, BASE_MAP_HEIGHT);
+                    _map = new Map(Ultraviolet, BASE_MAP_WIDTH, BASE_MAP_HEIGHT);
                     _firstLoad = false;
                 }
             };
@@ -64,11 +64,12 @@ namespace Doregal.UI.Screens
             if (IsReadyForInput)
             {
                 MainInput.Actions actions = Ultraviolet.GetInput().GetActions();
+                float mult = 0.05f;
 
-                if (actions.MoveLeft.IsDown()) _player.Move(-Vector2.UnitX, time.ElapsedTime);
-                else if (actions.MoveRight.IsDown()) _player.Move(Vector2.UnitX, time.ElapsedTime);
-                if (actions.MoveUp.IsDown()) _player.Move(-Vector2.UnitY, time.ElapsedTime);
-                else if (actions.MoveDown.IsDown()) _player.Move(Vector2.UnitY, time.ElapsedTime);
+                if (actions.MoveLeft.IsDown()) _player.Move(-Vector2.UnitX * mult, time.ElapsedTime);
+                else if (actions.MoveRight.IsDown()) _player.Move(Vector2.UnitX * mult, time.ElapsedTime);
+                if (actions.MoveUp.IsDown()) _player.Move(-Vector2.UnitY * mult, time.ElapsedTime);
+                else if (actions.MoveDown.IsDown()) _player.Move(Vector2.UnitY * mult, time.ElapsedTime);
 
                 if (actions.ExitApplication.IsDown())
                 {
@@ -86,9 +87,14 @@ namespace Doregal.UI.Screens
                 {
                     _map.Camera.Zoom += (float)y / 100;
                 };
+
+                if (mouse.IsButtonClicked(MouseButton.Left))
+                {
+                    _player.Attack((Vector2)mouse.Position);
+                }
             }
 
-            _player.RealMove(time.ElapsedTime);
+            _player.Update(time.ElapsedTime);
             _map.Camera.Update(_player.Position);
             base.OnUpdating(time);
         }
@@ -121,10 +127,7 @@ namespace Doregal.UI.Screens
                 }
             }
 
-            spriteBatch.DrawSprite(
-                _asciiSprite["Player"].Controller,
-                _map.Camera.ToScreenPos(_player.Position),
-                _map.Camera.Zoom, _map.Camera.Zoom, Color.Red, 0);
+            _player.Draw(_map.Camera, time, spriteBatch);
 
             base.OnDrawingForeground(time, spriteBatch);
         }

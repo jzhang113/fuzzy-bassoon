@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using Ultraviolet;
 
 namespace Doregal.World
 {
     // current position of the camera, in pixels
-    public class Camera
+    public class Camera : UltravioletResource
     {
         // positions in pixels
         public float MapWidth => MapWidthTiles * Zoom;
@@ -28,12 +27,14 @@ namespace Doregal.World
         public float OffsetX => X - TileX * Zoom;
         public float OffsetY => Y - TileY * Zoom;
 
-        public Camera(int mapWidth, int mapHeight, float screenWidth, float screenHeight, float zoom)
+        public Camera(UltravioletContext uv, int mapWidth, int mapHeight, float zoom) : base(uv)
         {
+            var view = Ultraviolet.GetGraphics().GetViewport();
+
             MapWidthTiles = mapWidth;
             MapHeightTiles = mapHeight;
-            ScreenWidth = screenWidth;
-            ScreenHeight = screenHeight;
+            ScreenWidth = view.Width;
+            ScreenHeight = view.Height;
             Zoom = zoom;
         }
 

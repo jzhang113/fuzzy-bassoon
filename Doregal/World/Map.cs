@@ -1,10 +1,11 @@
 ﻿using SharpNoise;
 using SharpNoise.Builders;
 using SharpNoise.Modules;
+using Ultraviolet;
 
 namespace Doregal.World
 {
-    public class Map
+    public class Map : UltravioletResource
     {
         public int Width { get; }
         public int Height { get; }
@@ -13,12 +14,12 @@ namespace Doregal.World
 
         private NoiseMap _noise;
 
-        public Map(int width, int height)
+        public Map(UltravioletContext uv, int width, int height) : base(uv)
         {
             Width = width;
             Height = height;
             Field = new bool[Width, Height];
-            Camera = new Camera(width, height, 640, 480, 16);
+            Camera = new Camera(uv, width, height, 32);
 
             Generate();
         }
