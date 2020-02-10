@@ -1,8 +1,10 @@
 ﻿using Doregal.Assets;
+using Doregal.Attacks;
 using Doregal.Entities;
 using Doregal.Input;
 using Doregal.World;
 using System;
+using System.Collections.Generic;
 using Ultraviolet;
 using Ultraviolet.Content;
 using Ultraviolet.Core;
@@ -25,6 +27,8 @@ namespace Doregal.UI.Screens
         private Map _map;
         private bool _firstLoad = true;
         private Entity _player;
+        private ICollection<Attack> _activeAttacks;
+        private ICollection<Attack> _finishedAttacks;
 
         private const int BASE_MAP_WIDTH = 80;
         private const int BASE_MAP_HEIGHT = 60;
@@ -46,6 +50,8 @@ namespace Doregal.UI.Screens
             _asciiSprite = GlobalContent.Load<Sprite>(GlobalSpriteID.Ascii);
 
             _player = new Entity(_asciiSprite["Player"], 0.5f, Color.Red);
+            _activeAttacks = new List<Attack>();
+            _finishedAttacks = new List<Attack>();
 
             Opening += (_) =>
             {
@@ -59,8 +65,6 @@ namespace Doregal.UI.Screens
 
         protected override void OnUpdating(UltravioletTime time)
         {
-            _player.ResetAccel();
-
             if (IsReadyForInput)
             {
                 MainInput.Actions actions = Ultraviolet.GetInput().GetActions();
@@ -90,12 +94,29 @@ namespace Doregal.UI.Screens
 
                 if (mouse.IsButtonClicked(MouseButton.Left))
                 {
-                    _player.Attack((Vector2)mouse.Position);
+                    Attack att = _player.Attack((Vector2)mouse.Position);
+                    if (att != null)
+                    {
+                        _activeAttacks.Add(att);
+                    }
                 }
             }
 
             _player.Update(time.ElapsedTime);
             _map.Camera.Update(_player.Position);
+
+            foreach (Attack attack in _activeAttacks)
+            {
+                attack.Update(time.ElapsedTime);
+
+                if (!attack.Attacking) _finishedAttacks.Add(attack);
+            }
+
+            foreach (Attack attack in _finishedAttacks)
+            {
+                _activeAttacks.Remove(attack);
+            }
+
             base.OnUpdating(time);
         }
 
@@ -128,6 +149,12 @@ namespace Doregal.UI.Screens
             }
 
             _player.Draw(_map.Camera, time, spriteBatch);
+
+            // active hitboxes
+            foreach (var attack in _activeAttacks)
+            {
+                attack.DrawHitbox(_map.Camera, time, spriteBatch);
+            }
 
             base.OnDrawingForeground(time, spriteBatch);
         }

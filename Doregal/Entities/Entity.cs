@@ -1,4 +1,5 @@
-﻿using Doregal.World;
+﻿using Doregal.Attacks;
+using Doregal.World;
 using System;
 using Ultraviolet;
 using Ultraviolet.Graphics;
@@ -20,11 +21,8 @@ namespace Doregal.Entities
         internal float Friction = 0.2f;
         internal Vector2 MaxVelocity = new Vector2(1, 1);
 
-        private bool _attacking = false;
-        private TimeSpan _attackDuration = TimeSpan.FromMilliseconds(500);
-        private TimeSpan _attackRemaining;
-        private RectangleF _hitbox;
-        private Texture2D _blankTexture;
+        private Attack _attackFactory;
+        private Attack _currentAttack;
 
         public Entity(SpriteAnimation sprite, float size, Color color)
         {
@@ -32,13 +30,32 @@ namespace Doregal.Entities
             Size = size;
             Color = color;
 
-            _blankTexture = Texture2D.CreateRenderBuffer(1, 1);
-            _blankTexture.SetData(new Color[] { Color.White });
+            _attackFactory = new Attack(TimeSpan.FromMilliseconds(500), 30, (pos, dt) => new Point2F(pos.X + 1, pos.Y + 1));
         }
 
         internal void Move(Vector2 accel, TimeSpan dt)
         {
-            Accel += accel;
+            if (_currentAttack == null || !_currentAttack.Attacking)
+            {
+                Accel += accel;
+            }
+        }
+
+        internal Attack Attack(Vector2 position)
+        {
+            if (_currentAttack == null || !_currentAttack.Attacking)
+            {
+                // choose attack
+                _currentAttack = _attackFactory.Begin(position);
+                return _currentAttack;
+            }
+            else
+            {
+                if (!_currentAttack.Attacking)
+                    _currentAttack = null;
+
+                return null;
+            }
         }
 
         internal void Update(TimeSpan dt)
@@ -52,34 +69,7 @@ namespace Doregal.Entities
             var bounds = new Vector2(MAP_WIDTH - Size, MAP_HEIGHT - Size);
 
             Position = Vector2.Clamp(newPos, Vector2.Zero, bounds);
-
-            // attack
-            if (_attacking)
-            {
-                _attackRemaining -= dt;
-                Color = Color.Blue;
-
-                if (_attackRemaining <= TimeSpan.Zero)
-                {
-                    _attacking = false;
-                    Color = Color.Red;
-                }
-            }
-        }
-
-        internal void ResetAccel()
-        {
             Accel = Vector2.Zero;
-        }
-
-        internal void Attack(Vector2 position)
-        {
-            if (!_attacking)
-            {
-                _attacking = true;
-                _attackRemaining = _attackDuration;
-                _hitbox = new RectangleF(position, new Size2F(50, 10));
-            }
         }
 
         public void Draw(Camera camera, UltravioletTime time, SpriteBatch spriteBatch)
@@ -88,11 +78,6 @@ namespace Doregal.Entities
                 SpriteAnimation.Controller,
                 camera.ToScreenPos(Position),
                 Size * camera.Zoom, Size * camera.Zoom, Color, 0);
-
-            if (_attacking)
-            {
-                spriteBatch.Draw(_blankTexture, _hitbox, Color.Blue);
-            }
         }
     }
 }

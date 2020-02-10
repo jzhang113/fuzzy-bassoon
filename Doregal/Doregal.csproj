@@ -9,10 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Optional" Version="4.0.0" />
     <PackageReference Include="SharpNoise" Version="0.12.0" />
-    <PackageReference Include="Ultraviolet.FreeType2" Version="2019.9.0.4045" />
-    <PackageReference Include="Ultraviolet.Game.NETCore" Version="2019.9.0.4045" />
-    <PackageReference Include="Ultraviolet.ImGuiViewProvider" Version="2019.9.0.4045" />
+    <PackageReference Include="Ultraviolet.FreeType2" Version="2020.2.0.4055" />
+    <PackageReference Include="Ultraviolet.Game.NETCore" Version="2020.2.0.4055" />
+    <PackageReference Include="Ultraviolet.ImGuiViewProvider" Version="2020.2.0.4055" />
   </ItemGroup>
 
   <ItemGroup>
