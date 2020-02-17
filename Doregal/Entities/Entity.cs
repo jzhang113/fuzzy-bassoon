@@ -2,7 +2,6 @@
 using Doregal.World;
 using System;
 using Ultraviolet;
-using Ultraviolet.Graphics;
 using Ultraviolet.Graphics.Graphics2D;
 
 namespace Doregal.Entities
@@ -21,7 +20,7 @@ namespace Doregal.Entities
         internal float Friction = 0.2f;
         internal Vector2 MaxVelocity = new Vector2(1, 1);
 
-        private Attack _attackFactory;
+        private readonly AttackFactory _attackFactory;
         private Attack _currentAttack;
 
         public Entity(SpriteAnimation sprite, float size, Color color)
@@ -30,28 +29,34 @@ namespace Doregal.Entities
             Size = size;
             Color = color;
 
-            _attackFactory = new Attack(TimeSpan.FromMilliseconds(500), 30, (pos, dt) => new Point2F(pos.X + 1, pos.Y + 1));
+            _attackFactory = new AttackFactory();
+            _attackFactory.Register("basic", pos => new AttackFrame[]
+            {
+                new AttackFrame(null, TimeSpan.FromMilliseconds(100), new CircleF[] { new CircleF(pos, 10) }, null),
+                new AttackFrame(null, TimeSpan.FromMilliseconds(100), new CircleF[] { new CircleF(pos.X, pos.Y + 10, 10) }, null),
+                new AttackFrame(null, TimeSpan.FromMilliseconds(100), new CircleF[] { new CircleF(pos.X, pos.Y + 20, 10) }, null),
+                new AttackFrame(null, TimeSpan.FromMilliseconds(100), new CircleF[] { new CircleF(pos.X, pos.Y + 30, 10) }, null),
+            });
         }
 
         internal void Move(Vector2 accel, TimeSpan dt)
         {
-            if (_currentAttack == null || !_currentAttack.Attacking)
+            if (_currentAttack == null || _currentAttack.Done)
             {
                 Accel += accel;
             }
         }
 
-        internal Attack Attack(Vector2 position)
+        internal Attack Attack(Point2F position)
         {
-            if (_currentAttack == null || !_currentAttack.Attacking)
+            if (_currentAttack == null || _currentAttack.Done)
             {
-                // choose attack
-                _currentAttack = _attackFactory.Begin(position);
+                _currentAttack = _attackFactory.Construct("basic", position);
                 return _currentAttack;
             }
             else
             {
-                if (!_currentAttack.Attacking)
+                if (_currentAttack.Done)
                     _currentAttack = null;
 
                 return null;

@@ -94,7 +94,7 @@ namespace Doregal.UI.Screens
 
                 if (mouse.IsButtonClicked(MouseButton.Left))
                 {
-                    Attack att = _player.Attack((Vector2)mouse.Position);
+                    Attack att = _player.Attack((Point2F)mouse.Position);
                     if (att != null)
                     {
                         _activeAttacks.Add(att);
@@ -109,7 +109,7 @@ namespace Doregal.UI.Screens
             {
                 attack.Update(time.ElapsedTime);
 
-                if (!attack.Attacking) _finishedAttacks.Add(attack);
+                if (attack.Done) _finishedAttacks.Add(attack);
             }
 
             foreach (Attack attack in _finishedAttacks)
