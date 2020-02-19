@@ -1,5 +1,6 @@
 ﻿using Doregal.Attacks;
 using Doregal.World;
+using SkiaSharp;
 using System;
 using Ultraviolet;
 using Ultraviolet.Graphics.Graphics2D;
@@ -77,12 +78,15 @@ namespace Doregal.Entities
             Accel = Vector2.Zero;
         }
 
-        public void Draw(Camera camera, UltravioletTime time, SpriteBatch spriteBatch)
+        public void Draw(Camera camera, UltravioletTime time, SKCanvas canvas)
         {
-            spriteBatch.DrawSprite(
-                SpriteAnimation.Controller,
-                camera.ToScreenPos(Position),
-                Size * camera.Zoom, Size * camera.Zoom, Color, 0);
+            using (var paint = new SKPaint())
+            {
+                paint.Color = new SKColor(50, 50, 50);
+
+                var pos = camera.ToScreenPos(Position);
+                canvas.DrawCircle(pos.X, pos.Y, camera.Zoom, paint);
+            }
         }
     }
 }

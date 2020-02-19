@@ -1,9 +1,9 @@
 ﻿using Doregal.World;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using Ultraviolet;
 using Ultraviolet.Graphics;
-using Ultraviolet.Graphics.Graphics2D;
 
 namespace Doregal.Attacks
 {
@@ -39,13 +39,19 @@ namespace Doregal.Attacks
             }
         }
 
-        internal void DrawHitbox(Camera camera, UltravioletTime time, SpriteBatch spriteBatch)
+        internal void DrawHitbox(Camera camera, UltravioletTime time, SKCanvas canvas)
         {
             if (Done) return;
 
-            foreach (CircleF circ in CurrFrame.Hitbox)
+            using (var paint = new SKPaint())
             {
-                spriteBatch.Draw(_blankTexture, new RectangleF(circ.Position, new Size2F(circ.Radius, circ.Radius)), Color.Blue);
+                paint.IsAntialias = true;
+                paint.Color = new SKColor(0, 0, 255);
+
+                foreach (CircleF circ in CurrFrame.Hitbox)
+                {
+                    canvas.DrawCircle(circ.X, circ.Y, circ.Radius, paint);
+                }
             }
         }
     }
